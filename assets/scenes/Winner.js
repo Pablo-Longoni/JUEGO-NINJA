@@ -1,6 +1,6 @@
-export default class GameOver extends Phaser.Scene {
+export default class Winner extends Phaser.Scene {
   constructor() {
-    super("gameOver");
+    super("Winner");
   }
 
   init() {}
@@ -11,7 +11,7 @@ export default class GameOver extends Phaser.Scene {
     // add sky background
     this.add.image(400, 300, "sky").setScale(0.555);
     //add text
-    this.gameOverText = this.add.text(265, 300, "PERDISTE", {
+    this.GameText = this.add.text(265, 300, "GANASTE", {
       fontSize: "60px",
       fill: "#000",
     });

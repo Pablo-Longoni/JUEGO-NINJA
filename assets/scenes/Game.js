@@ -21,6 +21,9 @@ export default class Game extends Phaser.Scene {
       ["Cuadrado"]: { count: 0, score: 20 },
       ["Rombo"]: { count: 0, score: 30 },
     };
+
+    this.isWinner = false;
+    this.isGameOver = false;
   }
 
   preload() {
@@ -74,9 +77,25 @@ export default class Game extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
+
+    //add text
+    this.scoreText = this.add.text(16, 16, "T: 0 / C: 0 / R:0", {
+      fontsize: "32 px",
+      fill: "#ffff",
+    });
   }
 
   update() {
+    //check if game over or win
+
+    if (this.isWinner) {
+      this.scene.start("Winner");
+    }
+
+    if (this.isGameOver) {
+      this.scene.start("gameOver");
+    }
+
     // update game objects
     // check if not game over or win
 
@@ -102,6 +121,35 @@ export default class Game extends Phaser.Scene {
 
     const shapeName = figuraChocada.texture.key;
     this.shapesRecolected[shapeName].count++;
+
+    //update score text
+    this.scoreText.setText(
+      "T: " +
+        this.shapesRecolected[TRIANGULO].count +
+        " / C: " +
+        this.shapesRecolected[CUADRADO].count +
+        " / R: " +
+        this.shapesRecolected[ROMBO].count
+    );
+
+    //check if winner
+    //take two of each shape
+
+    /*if (
+      this.shapesRecolected[TRIANGULO].count >= 2 &&
+      this.shapesRecolected[CUADRADO].count >= 2 &&
+      this.shapesRecolected[ROMBO].count >= 2
+    ) {
+      this.isWinner = true;
+    }*/
+
+    // map every element in shapesRecolected and check if >=2
+    if (
+      this.shapesRecolected.filter((item) => 2).length ===
+      this.shapesRecolected.length
+    ) {
+      this.isWinner = true;
+    }
 
     console.log(this.shapesRecolected);
   }
