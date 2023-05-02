@@ -24,6 +24,7 @@ export default class Game extends Phaser.Scene {
 
     this.isWinner = false;
     this.isGameOver = false;
+    this.timer = 30;
   }
 
   preload() {
@@ -83,6 +84,16 @@ export default class Game extends Phaser.Scene {
       fontsize: "32 px",
       fill: "#ffff",
     });
+
+    //create contador
+    this.time.addEvent({
+      delay: 1000,
+      callback: this.updateTimer,
+      callbackScope: this,
+      loop: true,
+    });
+
+    console.log(this.timer);
   }
 
   update() {
@@ -135,18 +146,10 @@ export default class Game extends Phaser.Scene {
     //check if winner
     //take two of each shape
 
-    /*if (
+    if (
       this.shapesRecolected[TRIANGULO].count >= 2 &&
       this.shapesRecolected[CUADRADO].count >= 2 &&
       this.shapesRecolected[ROMBO].count >= 2
-    ) {
-      this.isWinner = true;
-    }*/
-
-    // map every element in shapesRecolected and check if >=2
-    if (
-      this.shapesRecolected.filter((item) => 2).length ===
-      this.shapesRecolected.length
     ) {
       this.isWinner = true;
     }
@@ -165,5 +168,14 @@ export default class Game extends Phaser.Scene {
     this.shapesGroup.create(randomX, 0, randomShape);
 
     console.log("shape is added", randomX, randomShape);
+  }
+
+  updateTimer() {
+    this.timer = this.timer - 1;
+    console.log(this.timer);
+    this.add.text(16, 40, this.timer);
+    if (this.timer == 0) {
+      this.scene.start("gameOver");
+    }
   }
 }
