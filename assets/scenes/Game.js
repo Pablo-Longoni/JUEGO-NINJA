@@ -6,6 +6,7 @@ import {
   TRIANGULO,
   ROMBO,
   CUADRADO,
+  BOMBA,
 } from "../../utils.js";
 
 export default class Game extends Phaser.Scene {
@@ -20,11 +21,12 @@ export default class Game extends Phaser.Scene {
       ["Triangulo"]: { count: 0, score: 10 },
       ["Cuadrado"]: { count: 0, score: 20 },
       ["Rombo"]: { count: 0, score: 30 },
+      ["Bomba"]: { count: 0, score: -30 },
     };
 
     this.isWinner = false;
     this.isGameOver = false;
-    this.timer = 30;
+    this.timer = 60;
   }
 
   preload() {
@@ -35,6 +37,7 @@ export default class Game extends Phaser.Scene {
     this.load.image(TRIANGULO, "./assets/images/Triangulo.png");
     this.load.image(ROMBO, "./assets/images/Rombo.png");
     this.load.image(CUADRADO, "./assets/images/Cuadrado.png");
+    this.load.image(BOMBA,"./assets/images/Bomba.png");
   }
 
   create() {
@@ -50,14 +53,25 @@ export default class Game extends Phaser.Scene {
     this.platformsGroup = this.physics.add.staticGroup();
     this.platformsGroup.create(400, 568, "platform").setScale(2).refreshBody();
 
+    this.platform1 = this.physics.add.staticGroup();
+    this.platform1.create(-100, 400, "platform").setScale(2).refreshBody();
+
+    this.platform2 = this.physics.add.staticGroup();
+    this.platform2.create(900, 200, "platform").setScale(2).refreshBody();
+
     // add shapes group
     this.shapesGroup = this.physics.add.group();
 
     // add collider between player and platforms
     this.physics.add.collider(this.player, this.platformsGroup);
+    this.physics.add.collider(this.player, this.platform1);
+    this.physics.add.collider(this.player, this.platform2);
+    
 
     // add collider between platforms and shapes
     this.physics.add.collider(this.shapesGroup, this.platformsGroup);
+    this.physics.add.collider(this.shapesGroup, this.platform1);
+    this.physics.add.collider(this.shapesGroup, this.platform2);
 
     // add overlap between player and shapes
     this.physics.add.overlap(
@@ -80,7 +94,7 @@ export default class Game extends Phaser.Scene {
     });
 
     //add text
-    this.scoreText = this.add.text(16, 16, "T: 0 / C: 0 / R:0", {
+    this.scoreText = this.add.text(16, 16, "T: 0 / C: 0 / R:0 / PUNTOS:0", {
       fontsize: "32 px",
       fill: "#ffff",
     });
@@ -133,6 +147,9 @@ export default class Game extends Phaser.Scene {
     const shapeName = figuraChocada.texture.key;
     this.shapesRecolected[shapeName].count++;
 
+    const shapeScore = figuraChocada.texture.key;
+    this.shapesRecolected[shapeScore].score;
+
     //update score text
     this.scoreText.setText(
       "T: " +
@@ -140,7 +157,10 @@ export default class Game extends Phaser.Scene {
         " / C: " +
         this.shapesRecolected[CUADRADO].count +
         " / R: " +
-        this.shapesRecolected[ROMBO].count
+        this.shapesRecolected[ROMBO].count +
+        "/ PUNTOS: " +
+        this.shapesRecolected[ROMBO].score
+    
     );
 
     //check if winner
@@ -156,7 +176,13 @@ export default class Game extends Phaser.Scene {
 
     console.log(this.shapesRecolected);
   }
+     //check if winner
+    //reach 100 points
+    
 
+   
+
+    
   addShape() {
     // get random shape
     const randomShape = Phaser.Math.RND.pick(SHAPES);
