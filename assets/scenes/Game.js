@@ -7,6 +7,8 @@ import {
   ROMBO,
   CUADRADO,
   BOMBA,
+  POINTS_PERCENTAGE,
+  POINTS_PERCENTAGE_VALUE_START,
 } from "../../utils.js";
 
 export default class Game extends Phaser.Scene {
@@ -18,15 +20,16 @@ export default class Game extends Phaser.Scene {
 
   init() {
     this.shapesRecolected = {
-      ["Triangulo"]: { count: 0, score: 10 },
-      ["Cuadrado"]: { count: 0, score: 20 },
-      ["Rombo"]: { count: 0, score: 30 },
-      ["Bomba"]: { count: 0, score: -30 },
+        "Triangulo": { count: 0, score: 30 },
+        "Cuadrado": { count: 0, score: 30 },
+        "Rombo": { count: 0, score: 30 },
+        "Bomba": { count: 0, score: -30 },
     };
 
     this.isWinner = false;
     this.isGameOver = false;
     this.timer = 60;
+    this.score = 0; 
   }
 
   preload() {
@@ -82,6 +85,8 @@ export default class Game extends Phaser.Scene {
       this //dejar fijo por ahora
     );
 
+    this.physics.add.overlap(this.shapesGroup, this.platformsGroup, this.reduce, null, this); 
+
     // create cursors
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -92,6 +97,7 @@ export default class Game extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
+  
 
     //add text
     this.scoreText = this.add.text(16, 16, "T: 0 / C: 0 / R:0 / PUNTOS:0", {
@@ -99,7 +105,7 @@ export default class Game extends Phaser.Scene {
       fill: "#ffff",
     });
 
-    //create contador
+    //create 
     this.time.addEvent({
       delay: 1000,
       callback: this.updateTimer,
@@ -108,6 +114,7 @@ export default class Game extends Phaser.Scene {
     });
 
     console.log(this.timer);
+
   }
 
   update() {
@@ -146,9 +153,11 @@ export default class Game extends Phaser.Scene {
 
     const shapeName = figuraChocada.texture.key;
     this.shapesRecolected[shapeName].count++;
+    const percentage = figuraChocada.getData(POINTS_PERCENTAGE);
 
-    const shapeScore = figuraChocada.texture.key;
-    this.shapesRecolected[shapeScore].score;
+    this.score = this.score + this.shapesRecolected[shapeName].score * percentage;
+    
+
 
     //update score text
     this.scoreText.setText(
@@ -158,31 +167,22 @@ export default class Game extends Phaser.Scene {
         this.shapesRecolected[CUADRADO].count +
         " / R: " +
         this.shapesRecolected[ROMBO].count +
-        "/ PUNTOS: " +
-        this.shapesRecolected[ROMBO].score
-    
+        "/ PUNTOS: " + this.score
+        
     );
 
     //check if winner
     //take two of each shape
 
     if (
-      this.shapesRecolected[TRIANGULO].count >= 2 &&
-      this.shapesRecolected[CUADRADO].count >= 2 &&
-      this.shapesRecolected[ROMBO].count >= 2
+      this.score >= 100
     ) {
       this.isWinner = true;
     }
 
     console.log(this.shapesRecolected);
   }
-     //check if winner
-    //reach 100 points
-    
-
-   
-
-    
+  
   addShape() {
     // get random shape
     const randomShape = Phaser.Math.RND.pick(SHAPES);
@@ -191,7 +191,10 @@ export default class Game extends Phaser.Scene {
     const randomX = Phaser.Math.RND.between(0, 800);
 
     // add shape to screen
-    this.shapesGroup.create(randomX, 0, randomShape);
+    this.shapesGroup.create(randomX, 0, randomShape) 
+    .setCircle(32,0,0)
+    .setBounce(0.8)
+    .setData(POINTS_PERCENTAGE, POINTS_PERCENTAGE_VALUE_START);
 
     console.log("shape is added", randomX, randomShape);
   }
@@ -204,4 +207,21 @@ export default class Game extends Phaser.Scene {
       this.scene.start("gameOver");
     }
   }
+  reduce(shape, platform){
+    const newPercentage = shape.getData(POINTS_PERCENTAGE) - 0.25;
+    console.log(shape.texture.key, newPercentage);
+    shape.setData(POINTS_PERCENTAGE, newPercentage);
+    if (newPercentage <= 0) {
+      shape.disableBody(true,true);
+      return;
+  }
+  const text = this.add.text(shape.body.position.x+10, shape.body.position.y, "-25%", {
+    fontSize: "22px",
+    fontStyle: "bold",
+    fill: "red",
+  });
+  setTimeout(() => {
+    text.destroy();
+  }, 200);
+}
 }
