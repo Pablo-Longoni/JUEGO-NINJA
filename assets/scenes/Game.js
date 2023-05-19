@@ -55,26 +55,22 @@ export default class Game extends Phaser.Scene {
     // add platforms static group
     this.platformsGroup = this.physics.add.staticGroup();
     this.platformsGroup.create(400, 568, "platform").setScale(2).refreshBody();
+    this.platformsGroup.create(-100, 400, "platform").setScale(2).refreshBody();
+    this.platformsGroup.create(900, 200, "platform").setScale(2).refreshBody();
 
-    this.platform1 = this.physics.add.staticGroup();
-    this.platform1.create(-100, 400, "platform").setScale(2).refreshBody();
-
-    this.platform2 = this.physics.add.staticGroup();
-    this.platform2.create(900, 200, "platform").setScale(2).refreshBody();
+  
 
     // add shapes group
     this.shapesGroup = this.physics.add.group();
 
     // add collider between player and platforms
     this.physics.add.collider(this.player, this.platformsGroup);
-    this.physics.add.collider(this.player, this.platform1);
-    this.physics.add.collider(this.player, this.platform2);
+  
     
 
     // add collider between platforms and shapes
     this.physics.add.collider(this.shapesGroup, this.platformsGroup);
-    this.physics.add.collider(this.shapesGroup, this.platform1);
-    this.physics.add.collider(this.shapesGroup, this.platform2);
+
 
     // add overlap between player and shapes
     this.physics.add.overlap(
