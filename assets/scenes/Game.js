@@ -20,15 +20,15 @@ export default class Game extends Phaser.Scene {
 
   init() {
     this.shapesRecolected = {
-        "Triangulo": { count: 0, score: 30 },
-        "Cuadrado": { count: 0, score: 30 },
-        "Rombo": { count: 0, score: 30 },
+        "Triangulo": { count: 0, score: 10 },
+        "Cuadrado": { count: 0, score: 15 },
+        "Rombo": { count: 0, score: 20 },
         "Bomba": { count: 0, score: -30 },
     };
 
     this.isWinner = false;
     this.isGameOver = false;
-    this.timer = 60;
+    this.timer = 45;
     this.score = 0; 
   }
 
@@ -101,7 +101,7 @@ export default class Game extends Phaser.Scene {
       fill: "#ffff",
     });
 
-    //create 
+    //create timer
     this.time.addEvent({
       delay: 1000,
       callback: this.updateTimer,
@@ -198,7 +198,12 @@ export default class Game extends Phaser.Scene {
   updateTimer() {
     this.timer = this.timer - 1;
     console.log(this.timer);
-    this.add.text(16, 40, this.timer);
+    this.add.text(16, 40, this.timer,
+    {
+      fontSize: "16px",
+      fill: "#fff",
+      backgroundColor: "#000",
+    })
     if (this.timer == 0) {
       this.scene.start("gameOver");
     }
